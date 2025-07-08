@@ -1,6 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
+// ✅ Load from localStorage (if present)
+const storedUser =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("user") || "null")
+    : null;
+
+const initialState = storedUser || {
   _id: null,
   email: null,
   firstName: null,
@@ -8,6 +14,7 @@ const initialState = {
   color: null,
   authProvider: null,
   clerkId: null,
+  image: null,
 };
 
 export const userSlice = createSlice({
@@ -23,8 +30,10 @@ export const userSlice = createSlice({
         color,
         authProvider,
         clerkId,
+        image,
       } = action.payload;
 
+      // ✅ update state
       state._id = _id;
       state.email = email;
       state.firstName = firstName;
@@ -32,10 +41,28 @@ export const userSlice = createSlice({
       state.color = color;
       state.authProvider = authProvider;
       state.clerkId = clerkId;
+      state.image = image || null;
+
+      // ✅ store in localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(state));
+      }
     },
 
     clearUser(state) {
-      Object.assign(state, initialState); // resets everything
+      state._id = null;
+      state.email = null;
+      state.firstName = null;
+      state.lastName = null;
+      state.color = null;
+      state.authProvider = null;
+      state.clerkId = null;
+      state.image = null;
+
+      // ✅ clear from localStorage
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("user");
+      }
     },
   },
 });
